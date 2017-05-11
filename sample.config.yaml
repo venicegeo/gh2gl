@@ -1,0 +1,9 @@
+repos:
+  pz-access:
+    - gitlab: http://some.gitlab.yoursite.com/api/v3/projects
+    - github: https://github.com/githuborg/githubproj
+    - id: 2
+  pz-jobcommon:
+    - gitlab: http://some.gitlab.yoursite.com/api/v3/projects
+    - github: https://github.com/githuborg/othergithubproj
+    - id: 2
