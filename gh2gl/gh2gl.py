@@ -8,6 +8,8 @@ import argparse
 import requests
 
 def parse_args(args):
+    """Get the command-line arguments to pass in the config file
+    """
     parser = argparse.ArgumentParser(description='Mirror github repo(s) in gitlab.')
     parser.add_argument('config', help='yaml file containing repo urls')
     parser.add_argument('--apitoken', help='gitlab api token')
@@ -16,7 +18,6 @@ def parse_args(args):
 
 def createrepos():
     """Create the repos to be mirrored in gitlab
-       Vars needed: name, gitlab, github, id
     """
     parser = parse_args(sys.argv[1:])
     try:
