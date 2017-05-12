@@ -34,15 +34,20 @@ that your gitlab instance can access).
         ]
 4. Create your yaml configuration file similar to the [sample config](./sample.config.yaml) found here:
 ```
-repos:
-  githubproj:
-    - gitlab: http://some.gitlab.yoursite.com/api/v3/projects
-    - github: https://github.com/githuborg/githubproj
-    - id: 2
-  othergithubproj:
-    - gitlab: http://some.gitlab.yoursite.com/api/v3/projects
-    - github: https://github.com/githuborg/othergithubproj
-    - id: 2
+http://some.gitlab.yoursite.com/api/v3/projects:
+  pz-idam:
+    github: https://github.com/venicegeo/pz-idam
+    gitlabgid: 2
+  pz-sak:
+    github: https://github.com/venicegeo/pz-sak
+    gitlabgid: 2
+http://another.gitlab.yoursite.com/api/v3/projects:
+  bf-ui:
+    github: https://github.com/venicegeo/bf-ui
+    gitlabgid: 3
+  bf-tideprediction:
+    github: https://github.com/venicegeo/bf-tideprediction
+    gitlabgid: 3
 ```
 4. Use `$ ./gh2gl/gh2gl` to mirror your repositories, specifying the path to your configuration file:
 ```
@@ -56,7 +61,7 @@ positional arguments:
 optional arguments:
   -h, --help           show this help message and exit
   --apitoken APITOKEN  gitlab api token
-``` 
+```
 
 ## Dependencies
 - [requests](http://docs.python-requests.org/en/master/)

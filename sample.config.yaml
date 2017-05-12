@@ -1,9 +1,15 @@
-repos:
-  pz-access:
-    - gitlab: http://some.gitlab.yoursite.com/api/v3/projects
-    - github: https://github.com/githuborg/githubproj
-    - id: 2
-  pz-jobcommon:
-    - gitlab: http://some.gitlab.yoursite.com/api/v3/projects
-    - github: https://github.com/githuborg/othergithubproj
-    - id: 2
+http://some.gitlab.yoursite.com/api/v3/projects:
+  pz-idam:
+    github: https://github.com/venicegeo/pz-idam
+    gitlabgid: 2
+  pz-sak:
+    github: https://github.com/venicegeo/pz-sak
+    gitlabgid: 2
+http://another.gitlab.yoursite.com/api/v3/projects:
+  bf-ui:
+    github: https://github.com/venicegeo/bf-ui
+    gitlabgid: 3
+  bf-tideprediction:
+    github: https://github.com/venicegeo/bf-tideprediction
+    gitlabgid: 3
+

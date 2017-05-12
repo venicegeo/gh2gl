@@ -29,25 +29,21 @@ def createrepos():
         sys.exit('No API private token provided')
 
     try:
-        with open(parser.config) as data:
-            data = yaml.load(data)
+        with open(parser.config) as datafile:
+            repodata = yaml.load(datafile)
     except IOError:
         sys.exit('Cannot read file')
 
     headers = {'PRIVATE-TOKEN': gitlabtoken}
-    repos = data['repos']
-    names = repos.keys()
-    for name in names:
-        url = repos[name][0]['gitlab']
-        ghurl = repos[name][1]['github']
-        glname = name
-        glid = repos[name][2]['id']
-        data = {'name': glname,
-                'namespace_id': glid,
-                'import_url': ghurl
-               }
-        r = requests.post(url, headers=headers, data=data)
-        print r.text
+    gitlaburls = repodata.keys()
+    for gitlaburl in gitlaburls:
+        for item in repodata[gitlaburl]:
+            data = {'name': item,
+                    'namespace_id': repodata[gitlaburl][item]['gitlabgid'],
+                    'import_url': repodata[gitlaburl][item]['github']
+                   }
+            r = requests.post(gitlaburl, headers=headers, data=data)
+            print r.text
 
 if __name__ == "__main__":
     parse_args(sys.argv[1:])
