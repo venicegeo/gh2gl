@@ -18,8 +18,8 @@ that your gitlab instance can access).
 1. Clone this repo or download it locally
 2. Either add your access token as an environment variable: `GITLAB_API_PRIVATE_TOKEN=782fxBsiRGx7h-zkwZvx` or it can be supplied as an argument when you run gh2gl
 3. Determine your gitlab group id:
-`$ curl --header "PRIVATE-TOKEN: $GITLAB_API_PRIVATE_TOKEN" "localhost/api/v3/groups"`
-3. Create your yaml configuration file similar to the [!](./sample.config.yaml) found here:
+`$ curl --header "PRIVATE-TOKEN: $GITLAB_API_PRIVATE_TOKEN" "your.gitlab.url/api/v3/groups"`
+4. Create your yaml configuration file similar to the [sample config](./sample.config.yaml) found here:
 ```
 repos:
   githubproj:
@@ -31,7 +31,7 @@ repos:
     - github: https://github.com/githuborg/othergithubproj
     - id: 2
 ```
-4. Use `$ gh2gl` to mirror your repositories, specifying the path to your configuration file:
+4. Use `$ ./gh2gl/gh2gl` to mirror your repositories, specifying the path to your configuration file:
 ```
 usage: gh2gl.py [-h] [--apitoken APITOKEN] config
 
