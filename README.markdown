@@ -17,8 +17,21 @@ that your gitlab instance can access).
 
 1. Clone this repo or download it locally
 2. Either add your access token as an environment variable: `GITLAB_API_PRIVATE_TOKEN=782fxBsiRGx7h-zkwZvx` or it can be supplied as an argument when you run gh2gl
-3. Determine your gitlab group id:
-`$ curl --header "PRIVATE-TOKEN: $GITLAB_API_PRIVATE_TOKEN" "your.gitlab.url/api/v3/groups"`
+3. Determine your gitlab group id from the `"id"` field:
+        $ curl --header "PRIVATE-TOKEN: $GITLAB_API_PRIVATE_TOKEN" "your.gitlab.url/api/v3/groups"
+        [
+            {
+                "avatar_url": null,
+                "description": "",
+                "id": 2,
+                "lfs_enabled": true,
+                "name": "venice",
+                "path": "venice",
+                "request_access_enabled": true,
+                "visibility_level": 10,
+                "web_url": "http://gitlab.rbtcloud.dev/groups/venice"
+            }
+        ]
 4. Create your yaml configuration file similar to the [sample config](./sample.config.yaml) found here:
 ```
 repos:
