@@ -87,6 +87,7 @@ def createrepos(args):
             try:
                 resp = requests.post(gitlaburl, headers=headers, data=data)
                 resp.raise_for_status()
+                print resp.text
             except (requests.ConnectionError, requests.HTTPError) as e:
                 print "GitLab URL {} failed for GitHub Repo {} : {}".format(gitlaburl, data['import_url'], e)
                 raise

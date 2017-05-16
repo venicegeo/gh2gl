@@ -11,7 +11,7 @@
 # CONDITIONS OF ANY KIND, either express or implied. See the License for the
 # specific language governing permissions and limitations under the License.
 
-import gh2gl
+from gh2gl import gh2gl
 import os
 import requests
 import requests_mock
@@ -42,31 +42,31 @@ def test_create_repos_no_file_exists():
 	assert_raises(IOError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_invalid_yaml():
-	parsed_args = gh2gl.parse_args(['test_data/invalid_yaml.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/invalid_yaml.yaml', '--apitoken', 'test1234'])
 	assert_raises(AttributeError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_incomplete_yaml():
-	parsed_args = gh2gl.parse_args(['test_data/incomplete_config.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/incomplete_config.yaml', '--apitoken', 'test1234'])
 	assert_raises(KeyError, gh2gl.createrepos, parsed_args)
-	parsed_args = gh2gl.parse_args(['test_data/incomplete_config_2.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/incomplete_config_2.yaml', '--apitoken', 'test1234'])
 	assert_raises(KeyError, gh2gl.createrepos, parsed_args)
-	parsed_args = gh2gl.parse_args(['test_data/incomplete_config_3.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/incomplete_config_3.yaml', '--apitoken', 'test1234'])
 	assert_raises(TypeError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_invalid_url():
-	parsed_args = gh2gl.parse_args(['test_data/invalid_config.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/invalid_config.yaml', '--apitoken', 'test1234'])
 	assert_raises(ValueError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_invalid_gitlab_id():
-	parsed_args = gh2gl.parse_args(['test_data/invalid_config_2.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/invalid_config_2.yaml', '--apitoken', 'test1234'])
 	assert_raises(ValueError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_timeout():
-	parsed_args = gh2gl.parse_args(['test_data/test_config.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/test_config.yaml', '--apitoken', 'test1234'])
 	assert_raises(requests.ConnectionError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_success():
-	parsed_args = gh2gl.parse_args(['test_data/test_config.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['tests/data/test_config.yaml', '--apitoken', 'test1234'])
 	# Mock a successful HTTP Response
 	with requests_mock.mock() as mock:
 		mock.post('http://1.2.3.4.5/api/v3/projects', text='success')
