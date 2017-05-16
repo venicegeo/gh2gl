@@ -1,0 +1,3 @@
+http://some.gitlab.yoursite.com/api/v3/projects:
+  pz-not-an-app:
+    github: https://github.com/venicegeo/pz-not-an-app

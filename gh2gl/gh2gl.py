@@ -1,3 +1,16 @@
+# Copyright 2016, RadiantBlue Technologies, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+# this file except in compliance with the License. You may obtain a copy of the
+# License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed
+# under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+# CONDITIONS OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the License.
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -6,25 +19,26 @@ import yaml
 import sys
 import argparse
 import requests
+
 from urlparse import urlparse
 
+
 def parse_args(args):
-    """Get the command-line arguments to pass in the config file
-    """
+    # Get the command-line arguments to pass in the config file
     parser = argparse.ArgumentParser(description='Mirror github repo(s) in gitlab.')
     parser.add_argument('config', help='yaml file containing repo urls')
     parser.add_argument('--apitoken', help='gitlab api token')
-    return parser.parse_args()
+    return parser.parse_args(args)
 
-def validate_datafile():
-    parser = parse_args(sys.argv[1:])
 
+def validate_datafile(args):
     # Ensure an actual valid file was provided
     try:
-        with open(parser.config) as datafile:
+        with open(args.config) as datafile:
             repodata = yaml.load(datafile)
     except IOError:
-        sys.exit('Cannot read file %s' % (parser.config))
+        print 'Cannot read file %s' % (args.config)
+        raise
 
     # Ensure proper keys and values in the file
     try:
@@ -40,35 +54,45 @@ def validate_datafile():
                 if not isinstance(repodata[gitlaburl][item]['gitlabgid'], int):
                     raise ValueError('No gitlabgid %s %s' % (item, repodata[gitlaburl][item]['gitlabgid']))
     except Exception as e:
-        sys.exit('Error in config file: %s' % (e))
+        print 'Error in config file: %s' % (e)
+        raise
 
     return repodata
 
 
-def createrepos():
-    """Create the repos to be mirrored in gitlab
-    """
-    parser = parse_args(sys.argv[1:])
+def createrepos(args):
+    # Validate Token
     try:
-        if not parser.apitoken:
+        if not args.apitoken:
             gitlabtoken = os.environ['GITLAB_API_PRIVATE_TOKEN']
         else:
-            gitlabtoken = parser.apitoken
-    #except KeyError:
+            gitlabtoken = args.apitoken
     except Exception as e:
-        sys.exit('No API private token provided %s' % (e))
-    repodata = validate_datafile()
+        print 'No API private token provided %s' % (e)
+        raise
+
+    # Validate YAML File
+    repodata = validate_datafile(args)
     headers = {'PRIVATE-TOKEN': gitlabtoken}
+
+    # Perform Repo Clone
     gitlaburls = repodata.keys()
     for gitlaburl in gitlaburls:
         for item in repodata[gitlaburl]:
-            data = {'name': item,
-                    'namespace_id': repodata[gitlaburl][item]['gitlabgid'],
-                    'import_url': repodata[gitlaburl][item]['github']
-                   }
-            r = requests.post(gitlaburl, headers=headers, data=data)
-            print r.text
+            data = {
+                'name': item,
+                'namespace_id': repodata[gitlaburl][item]['gitlabgid'],
+                'import_url': repodata[gitlaburl][item]['github']
+                }
+            try:
+                resp = requests.post(gitlaburl, headers=headers, data=data)
+                resp.raise_for_status()
+                print resp.text
+            except (requests.ConnectionError, requests.HTTPError) as e:
+                print "GitLab URL {} failed for GitHub Repo {} : {}".format(gitlaburl, data['import_url'], e)
+                raise
+
 
 if __name__ == "__main__":
-    createrepos()
-
+    parsed_args = parse_args(sys.argv[1:])
+    createrepos(parsed_args)
