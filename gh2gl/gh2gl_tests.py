@@ -53,6 +53,14 @@ def test_create_repos_incomplete_yaml():
 	parsed_args = gh2gl.parse_args(['test_data/incomplete_config_3.yaml', '--apitoken', 'test1234'])
 	assert_raises(TypeError, gh2gl.createrepos, parsed_args)
 
+def test_create_repos_invalid_url():
+	parsed_args = gh2gl.parse_args(['test_data/invalid_config.yaml', '--apitoken', 'test1234'])
+	assert_raises(ValueError, gh2gl.createrepos, parsed_args)
+
+def test_create_repos_invalid_gitlab_id():
+	parsed_args = gh2gl.parse_args(['test_data/invalid_config_2.yaml', '--apitoken', 'test1234'])
+	assert_raises(ValueError, gh2gl.createrepos, parsed_args)
+
 def test_create_repos_timeout():
 	parsed_args = gh2gl.parse_args(['test_data/test_config.yaml', '--apitoken', 'test1234'])
 	assert_raises(requests.ConnectionError, gh2gl.createrepos, parsed_args)

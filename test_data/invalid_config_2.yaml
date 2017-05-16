@@ -1,0 +1,4 @@
+http://1.2.3.4.5/api/v3/projects:
+  pz-doesnt-exist:
+    github: http://github.com/venicegeo/pz-doesnt-exist
+    gitlabgid: http://github.com/venicegeo/pz-doesnt-exist

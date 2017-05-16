@@ -19,7 +19,9 @@ import yaml
 import sys
 import argparse
 import requests
+
 from urlparse import urlparse
+
 
 def parse_args(args):
     # Get the command-line arguments to pass in the config file
@@ -27,6 +29,7 @@ def parse_args(args):
     parser.add_argument('config', help='yaml file containing repo urls')
     parser.add_argument('--apitoken', help='gitlab api token')
     return parser.parse_args(args)
+
 
 def validate_datafile(args):
     # Ensure an actual valid file was provided
@@ -58,7 +61,7 @@ def validate_datafile(args):
 
 
 def createrepos(args):
-    # Validate Inputs
+    # Validate Token
     try:
         if not args.apitoken:
             gitlabtoken = os.environ['GITLAB_API_PRIVATE_TOKEN']
@@ -68,9 +71,11 @@ def createrepos(args):
         print 'No API private token provided %s' % (e)
         raise
 
+    # Validate YAML File
     repodata = validate_datafile(args)
     headers = {'PRIVATE-TOKEN': gitlabtoken}
 
+    # Perform Repo Clone
     gitlaburls = repodata.keys()
     for gitlaburl in gitlaburls:
         for item in repodata[gitlaburl]:
@@ -82,9 +87,10 @@ def createrepos(args):
             try:
                 resp = requests.post(gitlaburl, headers=headers, data=data)
                 resp.raise_for_status()
-            except requests.ConnectionError:
-                print "GitLab URL {} failed for GitHub Repo {}".format(gitlaburl, data['import_url'])
+            except (requests.ConnectionError, requests.HTTPError) as e:
+                print "GitLab URL {} failed for GitHub Repo {} : {}".format(gitlaburl, data['import_url'], e)
                 raise
+
 
 if __name__ == "__main__":
     parsed_args = parse_args(sys.argv[1:])
