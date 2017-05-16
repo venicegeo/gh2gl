@@ -19,6 +19,7 @@ import yaml
 import sys
 import argparse
 import requests
+from urlparse import urlparse
 
 def parse_args(args):
     # Get the command-line arguments to pass in the config file
@@ -26,6 +27,34 @@ def parse_args(args):
     parser.add_argument('config', help='yaml file containing repo urls')
     parser.add_argument('--apitoken', help='gitlab api token')
     return parser.parse_args(args)
+
+def validate_datafile(args):
+    # Ensure an actual valid file was provided
+    try:
+        with open(args.config) as datafile:
+            repodata = yaml.load(datafile)
+    except IOError:
+        print 'Cannot read file %s' % (args.config)
+        raise
+
+    # Ensure proper keys and values in the file
+    try:
+        gitlaburls = repodata.keys()
+        for gitlaburl in gitlaburls:
+            if ('http' or 'https') not in urlparse(gitlaburl).scheme:
+                raise KeyError('No valid gitlab url provided %s' % (gitlaburl))
+            for item in repodata[gitlaburl]:
+                if ('github' or 'gitlabgid') not in repodata[gitlaburl][item].keys():
+                    raise KeyError('No gitlabgid or github for %s %s' % (item, repodata[gitlaburl][item].keys()))
+                if ('http' or 'https') not in urlparse(repodata[gitlaburl][item]['github']).scheme:
+                    raise ValueError('No valid github url provided %s %s' % (item, repodata[gitlaburl][item]['github']))
+                if not isinstance(repodata[gitlaburl][item]['gitlabgid'], int):
+                    raise ValueError('No gitlabgid %s %s' % (item, repodata[gitlaburl][item]['gitlabgid']))
+    except Exception as e:
+        print 'Error in config file: %s' % (e)
+        raise
+
+    return repodata
 
 
 def createrepos(args):
@@ -35,21 +64,11 @@ def createrepos(args):
             gitlabtoken = os.environ['GITLAB_API_PRIVATE_TOKEN']
         else:
             gitlabtoken = args.apitoken
-    except KeyError:
-        print 'No API private token provided'
+    except Exception as e:
+        print 'No API private token provided %s' % (e)
         raise
 
-    try:
-        with open(args.config) as datafile:
-            repodata = yaml.load(datafile)
-    except IOError:
-        print 'Cannot read input file'
-        raise
-    except AttributeError:
-        print 'File not valid yaml format'
-        raise
-
-    # Create the repos to be mirrored in gitlab
+    repodata = validate_datafile(args)
     headers = {'PRIVATE-TOKEN': gitlabtoken}
 
     gitlaburls = repodata.keys()
