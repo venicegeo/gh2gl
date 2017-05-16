@@ -13,29 +13,32 @@
 
 import gh2gl
 import os
+import requests
+import requests_mock
+
 from mock import patch
 from nose.tools import assert_raises
 
 def test_argument_parsing():
 	# Successful parse
-	parsed_args = gh2gl.parse_args(['config.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['no_config.yaml', '--apitoken', 'test1234'])
 	assert parsed_args.apitoken == 'test1234'
-	assert parsed_args.config == 'config.yaml'
-	parsed_args = gh2gl.parse_args(['config.yaml'])
-	assert parsed_args.config == 'config.yaml'
+	assert parsed_args.config == 'no_config.yaml'
+	parsed_args = gh2gl.parse_args(['no_config.yaml'])
+	assert parsed_args.config == 'no_config.yaml'
 	assert parsed_args.apitoken == None
 	# Errors detected
 	assert_raises(BaseException, gh2gl.parse_args, ['--apitoken', 'test1234'])
 	assert_raises(BaseException, gh2gl.parse_args, [])
 
 def test_create_repos_invalid_token():
-	parsed_args = gh2gl.parse_args(['config.yaml'])
+	parsed_args = gh2gl.parse_args(['no_config.yaml'])
 	# Mock environment to ensure no Token is set
 	with patch.dict('os.environ'):
 		assert_raises(KeyError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_no_file_exists():
-	parsed_args = gh2gl.parse_args(['config.yaml', '--apitoken', 'test1234'])
+	parsed_args = gh2gl.parse_args(['no_config.yaml', '--apitoken', 'test1234'])
 	assert_raises(IOError, gh2gl.createrepos, parsed_args)
 
 def test_create_repos_invalid_yaml():
@@ -50,5 +53,13 @@ def test_create_repos_incomplete_yaml():
 	parsed_args = gh2gl.parse_args(['test_data/incomplete_config_3.yaml', '--apitoken', 'test1234'])
 	assert_raises(TypeError, gh2gl.createrepos, parsed_args)
 
-def test_create_repos():
-	pass
+def test_create_repos_timeout():
+	parsed_args = gh2gl.parse_args(['test_data/test_config.yaml', '--apitoken', 'test1234'])
+	assert_raises(requests.ConnectionError, gh2gl.createrepos, parsed_args)
+
+def test_create_repos_success():
+	parsed_args = gh2gl.parse_args(['test_data/test_config.yaml', '--apitoken', 'test1234'])
+	# Mock a successful HTTP Response
+	with requests_mock.mock() as mock:
+		mock.post('http://1.2.3.4.5/api/v3/projects', text='success')
+		gh2gl.createrepos(parsed_args)

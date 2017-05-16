@@ -51,15 +51,21 @@ def createrepos(args):
 
     # Create the repos to be mirrored in gitlab
     headers = {'PRIVATE-TOKEN': gitlabtoken}
+
     gitlaburls = repodata.keys()
     for gitlaburl in gitlaburls:
         for item in repodata[gitlaburl]:
-            data = {'name': item,
-                    'namespace_id': repodata[gitlaburl][item]['gitlabgid'],
-                    'import_url': repodata[gitlaburl][item]['github']
-                   }
-            r = requests.post(gitlaburl, headers=headers, data=data)
-            print r.text
+            data = {
+                'name': item,
+                'namespace_id': repodata[gitlaburl][item]['gitlabgid'],
+                'import_url': repodata[gitlaburl][item]['github']
+                }
+            try:
+                resp = requests.post(gitlaburl, headers=headers, data=data)
+                resp.raise_for_status()
+            except requests.ConnectionError:
+                print "GitLab URL {} failed for GitHub Repo {}".format(gitlaburl, data['import_url'])
+                raise
 
 if __name__ == "__main__":
     parsed_args = parse_args(sys.argv[1:])
