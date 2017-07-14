@@ -86,7 +86,6 @@ def createrepos(args):
                 }
             if args.visibility:
                 data['visibility_level'] = args.visibility
-                print data
             elif repodata[gitlaburl][item]['visibility']:
                 data['visibility_level'] = repodata[gitlaburl][item]['visibility']
             try:
