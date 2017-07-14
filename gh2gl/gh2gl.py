@@ -22,7 +22,6 @@ import requests
 
 from urlparse import urlparse
 
-
 def parse_args(args):
     # Get the command-line arguments to pass in the config file
     parser = argparse.ArgumentParser(description='Mirror github repo(s) in gitlab.')
@@ -88,6 +87,8 @@ def createrepos(args):
             if args.visibility:
                 data['visibility_level'] = args.visibility
                 print data
+            elif repodata[gitlaburl][item]['visibility']:
+                data['visibility_level'] = repodata[gitlaburl][item]['visibility']
             try:
                 resp = requests.post(gitlaburl, headers=headers, data=data)
                 resp.raise_for_status()
