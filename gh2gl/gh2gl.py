@@ -98,24 +98,20 @@ def createrepos(args):
                 print "GitLab URL {} failed for GitHub Repo {} : {}".format(gitlaburl, data['import_url'], e)
                 raise
             if 'webhook_url' in repodata[gitlaburl][item]:
-                print "there", item
                 project_id = return_data['id']
-                project_hook_endpoint = gitlaburl + '/' + str(project_id) + '/hooks'
-                print project_id
-                print project_hook_endpoint
-                print repodata[gitlaburl][item]['webhook_url']
+                project_hook_endpoint = '{}/{}/hooks'.format(gitlaburl, project_id)
                 data = {
                     'id': project_id,
                     'url': repodata[gitlaburl][item]['webhook_url']
                     }
                 print project_hook_endpoint, headers, data
                 resp = requests.post(project_hook_endpoint, headers=headers, data=data)
+                resp.raise_for_status()
                 print "Webhook added: ", resp.text
-                # And addd the deploy key
             if 'deploykey_id' in repodata[gitlaburl][item]:
                 project_id = return_data['id']
                 deploykey = repodata[gitlaburl][item]['deploykey_id']
-                project_hook_endpoint = gitlaburl + '/' + str(project_id) + '/deploy_keys/' + str(deploykey) + '/enable'
+                project_hook_endpoint = '{}/{}/deploy_keys/{}/enable'.format(gitlaburl, project_id, deploykey)
                 data = {
                     'id': project_id,
                     'key_id': deploykey
