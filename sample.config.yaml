@@ -16,4 +16,6 @@ http://another.gitlab.yoursite.com/api/v3/projects:
     # or 20 for public. In newer versions of gitlab, the api
     # uses strings instead of integers for this value
     visibility: 10
+    # The deploy key must exist already in your gitlab
+    deploykey_id: 19
 
