@@ -32,7 +32,8 @@ that your gitlab instance can access).
                 "web_url": "http://gitlab.rbtcloud.dev/groups/venice"
             }
         ]
-4. Create your yaml configuration file similar to the [sample config](./sample.config.yaml) found here:
+4. Create your yaml configuration file similar to the [sample config](./sample.config.yaml),
+optionally specifying `visibility` level and a `deploykey_id`:
 ```
 http://some.gitlab.yoursite.com/api/v3/projects:
   pz-idam:
@@ -48,19 +49,29 @@ http://another.gitlab.yoursite.com/api/v3/projects:
   bf-tideprediction:
     github: https://github.com/venicegeo/bf-tideprediction
     gitlabgid: 3
+    # visibility is optional and can be 0 for private 10 for internal
+    # or 20 for public. In newer versions of gitlab, the api
+    # uses strings instead of integers for this value
+    visibility: 10
+    # The deploy key must exist already in your gitlab
+    deploykey_id: 19
+
 ```
-4. Use `$ ./gh2gl/gh2gl` to mirror your repositories, specifying the path to your configuration file:
+5. Use `$ ./gh2gl/gh2gl` to mirror your repositories, specifying the path to your configuration file:
 ```
-usage: gh2gl.py [-h] [--apitoken APITOKEN] config
+usage: gh2gl.py [-h] [--apitoken APITOKEN] [--visibility {0,10,20}] config
 
 Mirror github repo(s) in gitlab.
 
 positional arguments:
-  config               yaml file containing repo urls
+  config                yaml file containing repo urls
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --apitoken APITOKEN  gitlab api token
+  -h, --help            show this help message and exit
+  --apitoken APITOKEN   gitlab api token
+  --visibility {0,10,20}
+                        project visibility level 0=private 10=internal
+                        20=public
 ```
 
 ## Dependencies
