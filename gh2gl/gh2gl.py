@@ -97,6 +97,7 @@ def createrepos(args):
             except (requests.ConnectionError, requests.HTTPError) as e:
                 print "GitLab URL {} failed for GitHub Repo {} : {}".format(gitlaburl, data['import_url'], e)
                 raise
+            # @TODO implement, try except to catch errors
             if 'webhook_url' in repodata[gitlaburl][item]:
                 project_id = return_data['id']
                 project_hook_endpoint = '{}/{}/hooks'.format(gitlaburl, project_id)
@@ -104,10 +105,13 @@ def createrepos(args):
                     'id': project_id,
                     'url': repodata[gitlaburl][item]['webhook_url']
                     }
-                print project_hook_endpoint, headers, data
-                resp = requests.post(project_hook_endpoint, headers=headers, data=data)
-                resp.raise_for_status()
-                print "Webhook added: ", resp.text
+                try:
+                    resp = requests.post(project_hook_endpoint, headers=headers, data=data)
+                    resp.raise_for_status()
+                    print "Webhook added: ", resp.text
+                except (requests.ConnectionError, requests.HTTPError) as e:
+                    print "Webhook update {} failed for GitLab Repo {} : {}".format(project_hook_endpoint, data, e)
+
             if 'deploykey_id' in repodata[gitlaburl][item]:
                 project_id = return_data['id']
                 deploykey = repodata[gitlaburl][item]['deploykey_id']
@@ -116,9 +120,12 @@ def createrepos(args):
                     'id': project_id,
                     'key_id': deploykey
                     }
-                resp = requests.post(project_hook_endpoint, headers=headers, data=data)
-                print "Deploy key added:", resp.text
-
+                try:
+                    resp = requests.post(project_hook_endpoint, headers=headers, data=data)
+                    resp.raise_for_status()
+                    print "Deploy key added:", resp.text
+                except (requests.ConnectionError, requests.HTTPError) as e:
+                    print "Deploy Key update {} failed for GitLab Repo {} : {}".format(project_hook_endpoint, data, e)
 
 if __name__ == "__main__":
     parsed_args = parse_args(sys.argv[1:])
